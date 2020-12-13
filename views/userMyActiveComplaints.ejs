@@ -125,27 +125,27 @@
     <section class="inner-page">
       <div class="container">
         
-          <% complaints.forEach((complaint)=>{ %>
-            <div class="blog-post">
-              <div class="blog-post__img">
-                <img src="<%=complaint.image.toString().substring(6,complaint.image.toString().length)%>" >
-              </div>
-              <div class="blog-post__info">
-               <div class="blog-post__date">
-                 <span><%=complaint.date.toString().substring(0,15)%></span>
-                 <span><%if (complaint.time!=undefined) {%><%=complaint.time.toString()%> <%} %></span>
-               </div>
-               <hr>
-               <h1 class="blog-post__title"></h1>
-               <p class="blog-post__text">
-                <%=complaint.complaint_address%>
-               </p>
-               <a href="#"  class="btn btn-danger">Report</a>
-              </div>
+        <% complaints.forEach((complaint)=>{ %>
+          <div class="blog-post" style="border: 4px solid #5cb874;">
+            <div class="blog-post__img">
+              <img src="<%=complaint.image.toString().substring(6,complaint.image.toString().length)%>" >
             </div>
-         <% })%>
-         
-      </div>
+            <div class="blog-post__info">
+             <div class="blog-post__date">
+               <span><h6 class="blog-post__title">Posted on: </h6><%=complaint.date.toString().substring(0,15)%>, <%if (complaint.time!=undefined) {%><%=complaint.time.toString()%> <%} %></span>
+               <span></span>
+             </div>
+             <hr>
+             <h6 class="blog-post__title">Location</h6>
+             <p class="blog-post__text">
+              <%=complaint.complaint_address%>
+             </p>
+             
+            </div>
+          </div>
+       <% })%>
+       
+    </div>
     </section>
 
   </main><!-- End #main -->

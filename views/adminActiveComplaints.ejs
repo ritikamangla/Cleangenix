@@ -623,14 +623,16 @@
                       <th scope="col" class="sort" data-sort="name">
                         Complaint ID
                       </th>
-                      <th scope="col" class="sort" data-sort="budget">
-                        User ID
-                      </th>
+
                       <th scope="col" class="sort" data-sort="status">
                         View on Map
                       </th>
                       <th scope="col" class="sort" data-sort="status">
                         Date & Time
+                      </th>
+
+                      <th scope="col" class="sort" data-sort="budget">
+                        User ID
                       </th>
 
                       <th scope="col"></th>
@@ -654,7 +656,7 @@
                           </div>
                         </div>
                       </th>
-                      <td class="budget"><%=complaint.user_id%></td>
+
                       <td class="text-right">
                         <div class="dropdown">
                           <a
@@ -681,6 +683,7 @@
                         (complaint.time!=undefined)
                         {%><%=complaint.time.toString()%> <%}%>
                       </td>
+                      <td class="budget"><%=complaint.user_id%></td>
                     </tr>
                     <% })%>
                   </tbody>

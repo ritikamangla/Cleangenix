@@ -160,14 +160,14 @@ const postUserComplaintForm = async (req, res) => {
 
       //******************ML part*************************
 
-      boolTrash = await util.detectTrash(`../public/active_complaints/${req.file.filename}`)
-      //console.log("this is the type of ", typeof(boolTrash))
-      const trashOrNot= boolTrash.trim().charAt(boolTrash.trim().length-1);
+      // boolTrash = await util.detectTrash(`../public/active_complaints/${req.file.filename}`)
+      // //console.log("this is the type of ", typeof(boolTrash))
+      // const trashOrNot= boolTrash.trim().charAt(boolTrash.trim().length-1);
 
-      if(trashOrNot==="0"){
-        errors.push({ message: "No trash detected" });
-        res.render("uploadComplaintForm", { errors, user_id, color: "red" });
-      }
+      // if(trashOrNot==="0"){
+      //   errors.push({ message: "No trash detected" });
+      //   res.render("uploadComplaintForm", { errors, user_id, color: "red" });
+      // }
 
       //get location from the photo
       console.log(req.file);
@@ -275,63 +275,108 @@ const getUserComplaintForm = async (req, res) => {
 const viewAllComplaints = async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM active_complaints");
+    const notifs = await pool.query(
+      "SELECT * FROM resolved_complaints WHERE user_id=$1 AND status=$2",
+      [req.params.user_id, "NR"]
+    );
+    let errors = [];
+    if (notifs.rows.length != 0) {
+      errors.push({
+        message: "Hey, some of your complaints have been resolved!",
+      });
+    }
     console.log("in view all complaints");
     console.log(req.params.user_id);
     console.log(result.rows.length);
     res.render("allComplaints", {
       complaints: result.rows,
       user_id: req.params.user_id,
+      errors,
+      color: "orange",
     });
   } catch (error) {
     throw error;
   }
 };
 
+//POST @ /user/complaints/view/filter/:user_id
+const filterComplaints = async (req, res) => {
+  try {
+    console.log("in here at filterComplaints");
+    var buf = parseFloat(req.body.distance) * 1000;
+    var user_id = req.params.user_id;
+    console.log("the distance chosen by the user is:", buf);
+
+    console.log(typeof buf);
+    pool.query(
+      "SELECT * FROM active_complaints,users WHERE st_intersects(active_complaints.geolocation,st_buffer(users.geolocation,$1))=$3 AND users.user_id=$2",
+      [buf, user_id, 1],
+
+      (err, result) => {
+        if (err) throw err;
+
+        console.log(result.rows);
+        // var campaignItems = result.rows;
+        // res.render("user_enroll", {
+        //   campaignItems: campaignItems,
+        //   user_id: user_id,
+        // });
+        res.render("allComplaints", {
+          complaints: result.rows,
+          user_id: req.params.user_id,
+        });
+      }
+    );
+  } catch (err) {
+    throw err;
+  }
+};
+
 const activeDrives = async (req, res) => {
-  try{ 
+  try {
     const result = await pool.query(
-      "SELECT * FROM campaign WHERE date>=CURRENT_DATE");
+      "SELECT * FROM campaign WHERE date>=CURRENT_DATE"
+    );
     // console.log(result);
     var campaignItems = result.rows;
     var addressArr = [];
     // console.log(campaignItems.length);
-    for(var i=0; i<campaignItems.length; i++)
-    {
+    for (var i = 0; i < campaignItems.length; i++) {
       var lat = campaignItems[i].lat_of_start;
       var long = campaignItems[i].long_of_start;
       const config = {
-      method: "get",
-      url: `https://us1.locationiq.com/v1/reverse.php?key=pk.9e8187ff3784e0e5cfef0fe6733bfd25&lat=${lat}&lon=${long}&format=json`,
-      headers: {
-        Cookie: "__cfduid=d87813cbe48abdce582fcd0f95df5d5331602794222",
-      },
-     };
+        method: "get",
+        url: `https://us1.locationiq.com/v1/reverse.php?key=pk.9e8187ff3784e0e5cfef0fe6733bfd25&lat=${lat}&lon=${long}&format=json`,
+        headers: {
+          Cookie: "__cfduid=d87813cbe48abdce582fcd0f95df5d5331602794222",
+        },
+      };
 
       const addressRes = await axios(config);
-    // console.log(JSON.stringify(latlongRes.data));
-    // console.log(JSON.stringify(addressRes.data));
+      // console.log(JSON.stringify(latlongRes.data));
+      // console.log(JSON.stringify(addressRes.data));
       const addr = addressRes.data.display_name;
-    
-    // console.log(typeof lat);
+
+      // console.log(typeof lat);
       console.log(addr);
-      addressArr[i]=addr;
+      addressArr[i] = addr;
     }
     // console.log(addressArr);
-    
-    var user_id = req.params.user_id;
-  // console.log(user_id);
-  
-      // console.log(result.rows);
-      // console.log(campaignItems[0].campaign_name);
 
-      res.render("user_enroll", {
-        campaignItems: campaignItems,
-        user_id: user_id,
-        addressArr:addressArr
-      });
-    }catch(err){
-      throw err;
-    }
+    var user_id = req.params.user_id;
+    // console.log(user_id);
+
+    // console.log(result.rows);
+    // console.log(campaignItems[0].campaign_name);
+
+    res.render("user_enroll", {
+      campaignItems: campaignItems,
+      user_id: user_id,
+      addressArr: addressArr,
+    });
+  } catch (err) {
+    throw err;
+  }
 };
 
 const participateCampaign = (req, res) => {
@@ -346,7 +391,7 @@ const participateCampaign = (req, res) => {
 
   pool.query(
     "INSERT INTO campaign_participation (user_id, campaign_id, campaign_name) VALUES ($1, $2, $3)",
-    [user_id, campaign_id,campaign_name],
+    [user_id, campaign_id, campaign_name],
     (err, result) => {
       if (err) throw err;
       else {
@@ -372,12 +417,11 @@ const filterCampaign = (req, res) => {
       var campaignItems = result.rows;
       res.render("user_enroll", {
         campaignItems: campaignItems,
-        user_id: user_id
+        user_id: user_id,
       });
     }
   );
 };
-
 
 //GET @ /user/profile/view/:user_id
 
@@ -424,7 +468,7 @@ const viewMyResolvedComplaints = async (req, res) => {
   try {
     const user_id = req.user[0].user_id;
     const response = await pool.query(
-      "SELECT * FROM resolved_complaints WHERE user_id=$1",
+      "SELECT * FROM resolved_complaints WHERE user_id=$1 order by status",
       [user_id]
     );
     res.render("userMyResolvedComplaints", {
@@ -437,13 +481,30 @@ const viewMyResolvedComplaints = async (req, res) => {
 };
 
 const acknowledgeComplaintResolution = async (req, res) => {
+  // try {
+  //   const user_id = req.params.user_id;
+  //   const resolved_complaint_id = req.params.resolved_complaint_id;
+
+  //   await pool.query(
+  //     "UPDATE resolved_complaints SET status=$1 WHERE complaint_id=$2",
+  //     ["R", resolved_complaint_id]
+  //   );
+  //   res.redirect(`/user/complaints/view/resolved/${user_id}`);
+  // } catch (error) {
+  //   throw error;
+  // }
   try {
     const user_id = req.params.user_id;
     const resolved_complaint_id = req.params.resolved_complaint_id;
-
+    const rating = req.body.input1;
+    console.log(typeof rating);
+    console.log("user rating is:", rating);
+    if (!rating) {
+      rating = 0;
+    }
     await pool.query(
-      "UPDATE resolved_complaints SET status=$1 WHERE complaint_id=$2",
-      ["R", resolved_complaint_id]
+      "UPDATE resolved_complaints SET status=$1, acknowledgment=$3 WHERE complaint_id=$2",
+      ["R", resolved_complaint_id, rating]
     );
     res.redirect(`/user/complaints/view/resolved/${user_id}`);
   } catch (error) {
@@ -485,9 +546,8 @@ const souchalay = async (req, res) => {
 
     var test1 = [];
     var test2 = [];
-    for (var i = 0; i < response.rows.length; i++)
-    {
-        test1.push([response.rows[i].lat, response.rows[i].long]);
+    for (var i = 0; i < response.rows.length; i++) {
+      test1.push([response.rows[i].lat, response.rows[i].long]);
     }
 
     console.log("First arrau");
@@ -505,13 +565,9 @@ const souchalay = async (req, res) => {
 
     const latl = response.rows;
 
-
-
-
-
     res.render("souchalayMap", {
       latl: latl,
-      test1:test1
+      test1: test1,
     });
 
     // console.log(JSON.stringify(response.rows));
@@ -527,68 +583,69 @@ const souchalay = async (req, res) => {
   }
 };
 
-const viewDrivesOnMap = async (req,res) => {
-  try{
-    const user_id= req.params.user_id;
+const viewDrivesOnMap = async (req, res) => {
+  try {
+    const user_id = req.params.user_id;
     const result = await pool.query("SELECT * FROM campaign");
     // console.log(result.rows);
     var allDrives = result.rows;
-    res.render("userDriveMap",{
-      allDrives:allDrives
+    res.render("userDriveMap", {
+      allDrives: allDrives,
     });
-
-  }catch(error) {
+  } catch (error) {
     throw error;
     res.send(error);
   }
-}
+};
 
-const getEnrolledDrives = async(user_id) => {
-  try{
-    const response = await pool.query("SELECT * FROM campaign_participation WHERE user_id=$1",
-    [user_id]
+const getEnrolledDrives = async (user_id) => {
+  try {
+    const response = await pool.query(
+      "SELECT * FROM campaign_participation WHERE user_id=$1",
+      [user_id]
     );
     return response.rows;
-  }catch(err){
+  } catch (err) {
     throw err;
   }
-}
+};
 
-const feedbackInsert = async (req,res) => {
-  try{
-  var user_id = req.params.user_id;
-  var feedback = req.body.feedback;
-  var campaign_name = req.body.drivesEn;
-  // console.log(typeof(user_id));
-  console.log(feedback);
-  console.log(user_id);
-  console.log(campaign_name);
+const feedbackInsert = async (req, res) => {
+  try {
+    var user_id = req.params.user_id;
+    var feedback = req.body.feedback;
+    var campaign_name = req.body.drivesEn;
+    // console.log(typeof(user_id));
+    console.log(feedback);
+    console.log(user_id);
+    console.log(campaign_name);
 
-  const sentiment = await util.getSentimentFromText(feedback);
-  console.log("the sentiment is:", sentiment)
+    //ML part
+    const sentiment = await util.getSentimentFromText(feedback);
+    console.log("the sentiment is:", sentiment);
 
-  var sent = parseInt(sentiment);
-  
-  const response = await pool.query("SELECT campaign_id FROM campaign WHERE campaign_name=$1",
-  [campaign_name]
-  );
-  var campaign_id = response.rows[0].campaign_id;
-  console.log(response.rows[0].campaign_id);
-  pool.query(
-    "UPDATE campaign_participation SET feedback=$1 WHERE user_id=$2 AND campaign_id=$3",
-    [feedback,user_id, campaign_id]);
-    res.redirect('/user/drives/enroll/feedback/' + user_id);
+    var sent = parseInt(sentiment);
 
-  pool.query(
-    "UPDATE campaign SET sentiments=sentiments + $1 WHERE campaign_id=$2",
-    [sent,campaign_id]
-  );
-  
-  }catch(err){
+    const response = await pool.query(
+      "SELECT campaign_id FROM campaign WHERE campaign_name=$1",
+      [campaign_name]
+    );
+    var campaign_id = response.rows[0].campaign_id;
+    console.log(response.rows[0].campaign_id);
+    pool.query(
+      "UPDATE campaign_participation SET feedback=$1 WHERE user_id=$2 AND campaign_id=$3",
+      [feedback, user_id, campaign_id]
+    );
+    res.redirect("/user/drives/enroll/feedback/" + user_id);
+
+    pool.query(
+      "UPDATE campaign SET sentiments=sentiments + $1 WHERE campaign_id=$2",
+      [sent, campaign_id]
+    );
+  } catch (err) {
     throw err;
   }
-  
-}
+};
 
 module.exports = {
   userRegister,
@@ -608,4 +665,5 @@ module.exports = {
   viewDrivesOnMap,
   getEnrolledDrives,
   feedbackInsert,
+  filterComplaints,
 };

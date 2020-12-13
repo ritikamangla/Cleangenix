@@ -622,6 +622,9 @@
                       <th scope="col" class="sort" data-sort="completion">
                         Status
                       </th>
+                      <th scope="col" class="sort" data-sort="completion">
+                        Rating
+                      </th>
                       <th scope="col" class="sort" data-sort="budget">
                         User ID
                       </th>
@@ -675,6 +678,24 @@
                         <span class="badge badge-dot mr-4">
                           <i class="bg-success"></i>
                           <span class="status">confirmed</span>
+                        </span>
+                      </td>
+                      <%}%> <% if (!complaint.acknowledgment){%>
+
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-warning"></i>
+                          <span class="status">-</span>
+                        </span>
+                      </td>
+
+                      <%} else {%>
+                      <td>
+                        <span class="badge badge-dot mr-4">
+                          <i class="bg-success"></i>
+                          <span class="status"
+                            ><%=complaint.acknowledgment%></span
+                          >
                         </span>
                       </td>
                       <%}%>

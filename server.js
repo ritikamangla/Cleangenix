@@ -179,13 +179,10 @@ passport.deserializeUser(function (user, done) {
 
 //******************end********************** */
 
-
-
 //Souchalay
 app.get("/user/souchalay", (req, res) => {
   res.render("souchalay");
 });
-
 
 app.post("/user/souchalay", db.souchalay);
 
@@ -196,15 +193,11 @@ app.get("/user/souchalay/:lat/:long", (req, res) => {
   });
 });
 
-
 //********************NewsLetter*********************
 
 app.get("/newsletter", (req, res) => {
-  
-    gdb.allNews(req, res);
-  
+  gdb.allNews(req, res);
 });
-
 
 //POST@ /newsletter/filter
 //for filtering news tags
@@ -246,6 +239,14 @@ app.get("/user/complaints/view/:user_id", (req, res) => {
     console.log(req.params.user_id);
     db.viewAllComplaints(req, res);
   }
+});
+
+// POST@ /users/complaints/view/filter/:user_id
+//filtering complaints according to distance
+
+app.post("/user/complaints/view/filter/:user_id", (req, res) => {
+  console.log("I am here in post");
+  db.filterComplaints(req, res);
 });
 
 //GET@ /user/complaints/view/my/:user_id
@@ -298,21 +299,23 @@ app.post("/user/drives/enroll/:user_id", db.participateCampaign);
 app.post("/user/drives/enroll/filter/:user_id", db.filterCampaign);
 
 // app.post("/user/drives/enroll/filter/map/:user_id",db.viewDrivesOnMap);
-app.get("/user/drives/enroll/map/:user_id", (req,res) =>{
-  db.viewDrivesOnMap(req,res);
+app.get("/user/drives/enroll/map/:user_id", (req, res) => {
+  db.viewDrivesOnMap(req, res);
 });
 
-app.get("/user/drives/enroll/feedback/:user_id", async (req,res) => {
-  try{
+app.get("/user/drives/enroll/feedback/:user_id", async (req, res) => {
+  try {
     const enrolledDrives = await db.getEnrolledDrives(req.params.user_id);
-    res.render("feedbackForm", {user_id:req.params.user_id, enrolledDrives:enrolledDrives});
-  }catch(err){
+    res.render("feedbackForm", {
+      user_id: req.params.user_id,
+      enrolledDrives: enrolledDrives,
+    });
+  } catch (err) {
     throw err;
   }
- 
 });
 
-app.post("/user/drives/enroll/feedback/:user_id",db.feedbackInsert);
+app.post("/user/drives/enroll/feedback/:user_id", db.feedbackInsert);
 
 //*****************************end ************************ */
 //*******************************admin routes******************** */
@@ -403,50 +406,48 @@ app.get("/admin/complaints/activeMap/:ward_id", async (req, res) => {
 });
 
 //GET @ /admin/drives/initiate/:ward_id
-app.get("/admin/drives/initiate/:ward_id", (req,res) => {
+app.get("/admin/drives/initiate/:ward_id", (req, res) => {
   res.render("adminInitiateCampaign", {
-    ward_id: req.params.ward_id
+    ward_id: req.params.ward_id,
   });
 });
 
-app.post("/admin/drives/initiate/:ward_id",db.initiateCampaign);
+app.post("/admin/drives/initiate/:ward_id", db.initiateCampaign);
 
-
-app.get("/admin/drives/view/:ward_id", async (req,res) => {
- 
+app.get("/admin/drives/view/:ward_id", async (req, res) => {
   try {
-    const campaign_items = await db.getCampaignName(
-      req.params.ward_id
-    );
+    const campaign_items = await db.getCampaignName(req.params.ward_id);
     const campaign_details = [];
     const count = 0;
     res.render("adminViewPart", {
       ward_id: req.params.ward_id,
       campaign_items: campaign_items,
-      campaign_details:campaign_details,
-      count:count,
+      campaign_details: campaign_details,
+      count: count,
     });
   } catch (error) {
     throw error;
   }
 });
 
-app.post("/admin/drives/view/:ward_id", db.viewParticipants)
+app.post("/admin/drives/view/:ward_id", db.viewParticipants);
 
-app.get("/admin/drives/view/sentiment/:ward_id", async (req,res) => {
-  try{
+app.get("/admin/drives/view/sentiment/:ward_id", async (req, res) => {
+  try {
     const ward_id = req.params.ward_id;
-    const campaign_details = await db.collectCampSenti(req,res);
+    const campaign_details = await db.collectCampSenti(req, res);
     // const part = await db.numberOfPart(req,res);
     // const ward_name = await db.wardName(req,res);
     // console.log(result);
     // console.log(part);
     console.log(campaign_details);
-    res.render("sentimentCamp",{ward_id:ward_id, campaign_details:campaign_details});
-  }catch(err){
+    res.render("sentimentCamp", {
+      ward_id: ward_id,
+      campaign_details: campaign_details,
+    });
+  } catch (err) {
     throw err;
   }
- 
 });
 
 //*************************************end************************** */

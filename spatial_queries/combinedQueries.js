@@ -43,6 +43,8 @@ const collectCampSenti = campaignQueries.collectCampSenti;
 const numberOfPart = campaignQueries.numberOfPart;
 const wardName = campaignQueries.wardName;
 
+const filterComplaints = userQueries.filterComplaints;
+
 //Worker Queries
 
 module.exports = {
@@ -75,4 +77,5 @@ module.exports = {
   collectCampSenti,
   numberOfPart,
   wardName,
+  filterComplaints,
 };

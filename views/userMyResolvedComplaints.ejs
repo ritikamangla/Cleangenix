@@ -13,6 +13,12 @@
   <link href="/img/favicon.png" rel="icon">
   <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
 
+  <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-star-rating/4.0.2/css/star-rating.min.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-star-rating/4.0.2/js/star-rating.min.js"></script>
+</head>
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
@@ -135,16 +141,34 @@
               </div>
               <div class="blog-post__info">
                <div class="blog-post__date">
-                 <span><%=complaint.date.toString().substring(0,15)%></span>
-                 <span><%if (complaint.time!=undefined) {%><%=complaint.time.toString()%> <%} %></span>
+                <span><h6 class="blog-post__title">Resolved on: </h6><%=complaint.date.toString().substring(0,15)%>, <%if (complaint.time!=undefined) {%><%=complaint.time.toString()%> <%} %></span>
                </div>
                <hr>
-               <h1 class="blog-post__title"></h1>
+               <h6 class="blog-post__title">Location</h6>
                <p class="blog-post__text">
                  <%=complaint.complaint_address%>
                </p>
                <% if (complaint.status==="NR") {%>
                 <form action="/user/complaints/ack/<%=user_id%>/<%=complaint.complaint_id%>" method="POST">
+                  
+                  <!-- <div class="form-group">
+                    <label for="comment"><h6 class="blog-post__title">Comment: </h6></label>
+                    <textarea name="comment" class="form-control" rows="3" id="comment" placeholder="(optional)"></textarea>
+                  </div>
+                  <hr> -->
+                  <!-- <label class="radio-inline"><input type="radio" name="optradio" checked><h6 class="blog-post__title">Thank you!</h6></label>
+                  <label class="radio-inline"><input type="radio" name="optradio"><h6 class="blog-post__title">Satisfactory</h6></label>
+                  <label class="radio-inline"><input type="radio" name="optradio"></label> -->
+                  <!-- <div class="container"> -->
+
+
+                    
+                  
+                  
+                      <br/>
+                      <label for="input-1" class="control-label"><h6 class="blog-post__title">Give a rating:</h6></label>
+                      <input style="color: green"id="input-1" name="input1" class="rating rating-loading" data-min="0" data-max="5" data-step="0.5">
+                  <!-- </div> -->
                     <button class="btn btn-warning">Confirm Acknowledgment</button>
                 </form>
                
@@ -201,6 +225,9 @@
 
   <!-- Template Main JS File -->
   <script src="/js/main.js"></script>
+  <script>
+    $("#input-id").rating();
+    </script>
   
 </body>
 
