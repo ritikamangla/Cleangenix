@@ -180,11 +180,19 @@ passport.deserializeUser(function (user, done) {
 //******************end********************** */
 
 //Souchalay
-app.get("/user/souchalay", (req, res) => {
-  res.render("souchalay");
+app.get("/user/souchalay/:user_id", (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.redirect("/user/login");
+  } else {
+    res.render("souchalay", {
+      user_id: req.params.user_id,
+      color: "green",
+      
+    });
+  }
 });
 
-app.post("/user/souchalay", db.souchalay);
+app.post("/user/souchalay/:user_id", db.souchalay);
 
 app.get("/user/souchalay/:lat/:long", (req, res) => {
   res.render("souchalayMap", {
@@ -331,10 +339,30 @@ app.get("/admin/login", (req, res) => {
 //POST @ /admin/login
 app.post("/admin/login", db.adminLogin);
 
-//GET @ /admin/home
-app.get("/admin/home/:ward_id", (req, res) => {
-  res.render("adminHome", { ward_id: req.params.ward_id });
+// For adminHome
+
+app.get("/admin/home/:ward_id", async (req, res) => {
+
+  const activec = await db.getAdminDetails(req.params.ward_id);
+  //const totusers = await gdb.calculateWardRewardPoints(req.params.ward_id);
+  console.log("In route");
+  console.log(activec[0]);  
+
+  const active = activec[0];
+  const resolve = activec[1];
+
+  const rewards = resolve/(active + resolve)*100;
+
+  res.render("adminHome" ,
+    {ward_id: req.params.ward_id,
+      active:active,
+      resolve:resolve,
+      rewards:rewards,
+
+    });
 });
+
+
 
 //GET @ /admin/logout
 app.get("/admin/logout", (req, res) => {

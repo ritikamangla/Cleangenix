@@ -38,8 +38,10 @@ const insertWardGeoJSON = async (req, res) => {
 
 //ward login
 const adminLogin = async (req, res) => {
-  alert("Foo");
+  
   let errors = [];
+
+
   const { username, password } = req.body;
   await pool.query(
     "SELECT * FROM ward WHERE username = $1",
@@ -66,7 +68,13 @@ const adminLogin = async (req, res) => {
               break;
             }
           }
-          if (flag == 1) {
+          if (flag == 1)
+          {
+              
+              
+              console.log("HI");
+
+
             console.log("Matches");
             res.redirect(`/admin/home/${ward_id}`);
           } else {
@@ -79,4 +87,31 @@ const adminLogin = async (req, res) => {
   );
 };
 
-module.exports = { insertWardGeoJSON, adminLogin };
+const getAdminDetails = async (ward_id) => {
+  try {
+    const activec = await pool.query(
+      "SELECT count(*) FROM active_complaints WHERE ward_id=$1",
+      [ward_id]
+    );
+
+    const resolvec = await pool.query(
+      "SELECT count(*) FROM resolved_complaints WHERE ward_id=$1",
+      [ward_id]
+    );
+
+    var list = [];
+    list[0] = activec.rows[0].count;
+    list[1] = resolvec.rows[0].count;
+
+    console.log("BYEEEE");
+    console.log(list[0]);
+    console.log(list[1]);
+
+    //console.log(response.rows);
+    return list;
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = { insertWardGeoJSON, adminLogin , getAdminDetails,};

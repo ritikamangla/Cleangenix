@@ -21,6 +21,7 @@ const viewDrivesOnMap = userQueries.viewDrivesOnMap;
 const getEnrolledDrives = userQueries.getEnrolledDrives;
 const feedbackInsert = userQueries.feedbackInsert;
 const adminLogin = adminQueries.adminLogin;
+const getAdminDetails = adminQueries.getAdminDetails;
 
 const getActiveComplaints = complaintQueries.getActiveComplaints;
 const resolveComplaint = complaintQueries.resolveComplaint;
@@ -78,4 +79,5 @@ module.exports = {
   numberOfPart,
   wardName,
   filterComplaints,
+  getAdminDetails,
 };

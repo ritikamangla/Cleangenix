@@ -10,7 +10,7 @@ const alert = require("alert");
 const validator = require("validator");
 
 const workerLogin = async (req, res) => {
-  alert("Foo");
+  
   let errors = [];
   const { username, password } = req.body;
   await pool.query(

@@ -6,6 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<title>Cleangenix</title>
   <meta content="" name="descriptison">
     <meta content="" name="keywords">
 
@@ -77,24 +78,29 @@
 
       <nav class="nav-menu d-none d-lg-block">
         <ul>
-          <li class="active"><a href="/">Home</a></li>
-          <li><a href="/#about">About</a></li>
-          <li><a href="/#services">Services</a></li>
-          <li><a href="/#portfolio">Portfolio</a></li>
-          <li><a href="/#team">Team</a></li>
-          <li class="drop-down"><a href="">Users</a>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li class="drop-down"><a href="">Complaints</a>
             <ul>
-              <li><a href="/user/register/no_ref">Users</a></li>
-              <li><a href="/admin/login">Admin</a></li>
-              <li><a href="/#">BMC Worker</a></li>
+              <li><a href="/user/complaints/view/<%=user_id%>">View all complaints</a></li>
+              <li><a href="/user/complaints/post/<%=user_id%>">Post a complaint</a></li>
+              
             </ul>
           </li>
-          <li><a href="/#">Newsletter</a></li>
+          <li class="drop-down"><a href="">Campaigns</a>
+            <ul>
+              
+              <li><a href="/user/drives/enroll/<%=user_id%>">Enroll in a Campaign</a></li>
+            </ul>
+          </li>
+          <li><a href="/user/souchalay/<%=user_id%>">Nearest Souchalay</a></li>
+          
+          <li><a href="/user/profile/view/<%=user_id%>">My profile</a></li>
 
         </ul>
       </nav><!-- .nav-menu -->
 
-      <a href="/user/register/no_ref" class="get-started-btn scrollto">Register</a>
+      <a href="/user/logout" class="get-started-btn scrollto">Logout</a>
 
     </div>
   </header><!-- End Header -->
@@ -133,7 +139,7 @@
           <div class="wrap-login100">
 
 
-            <form class="login100-form validate-form p-l-55 p-r-55 p-t-178" action="/user/souchalay" method="POST">
+            <form class="login100-form validate-form p-l-55 p-r-55 p-t-178" action="/user/souchalay/<%=user_id%>" method="POST">
               <span class="login100-form-title">
                 Find Nearest Souchalay
               </span>

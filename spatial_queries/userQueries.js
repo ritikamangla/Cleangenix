@@ -403,26 +403,47 @@ const participateCampaign = (req, res) => {
   );
 };
 
-const filterCampaign = (req, res) => {
+const filterCampaign = async(req, res) =>  {
+  try{
   var buf = parseFloat(req.body.distance) * 1000;
   var user_id = req.params.user_id;
-
+  
   console.log(typeof buf);
-  pool.query(
+  const result = await pool.query(
     "SELECT * FROM campaign,users WHERE st_intersects(campaign.geolocation,st_buffer(users.geolocation,$1)) AND users.user_id=$2 AND campaign.date>=CURRENT_DATE",
     [buf, user_id],
-
-    (err, result) => {
-      if (err) throw err;
-
-      console.log(result.rows);
-      var campaignItems = result.rows;
-      res.render("user_enroll", {
-        campaignItems: campaignItems,
-        user_id: user_id,
-      });
-    }
   );
+  var campaignItems = result.rows;
+  var addressArr = [];
+
+  for(var i=0; i<campaignItems.length; i++)
+    {
+      var lat = campaignItems[i].lat_of_start;
+      var long = campaignItems[i].long_of_start;
+      const config = {
+      method: "get",
+      url: `https://us1.locationiq.com/v1/reverse.php?key=pk.9e8187ff3784e0e5cfef0fe6733bfd25&lat=${lat}&lon=${long}&format=json`,
+      headers: {
+        Cookie: "__cfduid=d87813cbe48abdce582fcd0f95df5d5331602794222",
+      },
+     };
+     const addressRes = await axios(config);
+    // console.log(JSON.stringify(latlongRes.data));
+    // console.log(JSON.stringify(addressRes.data));
+      const addr = addressRes.data.display_name;
+    
+    // console.log(typeof lat);
+      console.log(addr);
+      addressArr[i]=addr;
+    }
+    res.render("user_enroll", {
+      campaignItems: campaignItems,
+      user_id: user_id,
+      addressArr:addressArr
+    });
+  }catch(err){
+    throw err;
+  }
 };
 
 //GET @ /user/profile/view/:user_id
@@ -516,6 +537,7 @@ const acknowledgeComplaintResolution = async (req, res) => {
 
 const souchalay = async (req, res) => {
   try {
+    const user_id = req.params.user_id;
     let errors = [];
     const { pincode } = req.body;
 
@@ -566,11 +588,9 @@ const souchalay = async (req, res) => {
     }
 
     const latl = response.rows;
+    res.render("souchalayMap", { latl, user_id});
 
-    res.render("souchalayMap", {
-      latl: latl,
-      test1: test1,
-    });
+    
 
     // console.log(JSON.stringify(response.rows));
   } catch (err) {
