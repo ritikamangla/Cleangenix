@@ -564,31 +564,17 @@ const souchalay = async (req, res) => {
     );*/
 
     const response = await pool.query(
-      "SELECT lat,long FROM latrine WHERE st_intersects(ST_MakePoint($1, $2),st_buffer(latrine.latrine_location,10000))",
+      "SELECT lat,long,location FROM latrine WHERE st_intersects(ST_MakePoint($1, $2),st_buffer(latrine.latrine_location,10000))",
       [lat, long]
     );
 
-    var test1 = [];
-    var test2 = [];
-    for (var i = 0; i < response.rows.length; i++) {
-      test1.push([response.rows[i].lat, response.rows[i].long]);
-    }
-
-    console.log("First arrau");
-
-    for (var i = 0; i < test1.length; i++) {
-      console.log(test1[i][0]);
-      console.log(test1[i][1]);
-    }
-
-    console.log("After test1");
-    for (var i = 0; i < response.length; i++) {
-      console.log(response.rows[i].lat);
-      console.log("BYE");
-    }
-
     const latl = response.rows;
-    res.render("souchalayMap", { latl, user_id});
+    res.render("souchalayMap", { 
+      user_id:user_id,
+      latl:latl,
+      lat:lat,
+      long:long,
+    });
 
     
 
@@ -604,6 +590,47 @@ const souchalay = async (req, res) => {
     }
   }
 };
+
+
+const viewAllSouchalay = async (req, res) => {
+
+  try
+  {
+    const userlat = req.params.lat;
+    const userlong = req.params.long;
+
+    console.log("LAT LONG USER");
+    console.log(userlat);
+    console.log(userlong);
+    
+
+
+    const location = req.body.enroll;
+    const lat = req.body.latitude;
+    const long = req.body.longitude;
+
+    console.log("LAT LONG LATRINE");
+    
+    console.log(lat);
+    console.log(long);
+    
+
+    res.render("souchalayMapRoutes" , {
+      lat:lat,
+      long:long,
+      userlat:userlat,
+      userlong:userlong,
+    })
+
+  }catch(err)
+  {
+    throw err;
+  }
+  
+  
+
+};
+
 
 const viewDrivesOnMap = async (req, res) => {
   try {
@@ -688,4 +715,5 @@ module.exports = {
   getEnrolledDrives,
   feedbackInsert,
   filterComplaints,
+  viewAllSouchalay
 };

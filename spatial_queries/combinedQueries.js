@@ -36,6 +36,7 @@ const acknowledgeComplaintResolution =
   userQueries.acknowledgeComplaintResolution;
 
 const souchalay = userQueries.souchalay;
+const viewAllSouchalay = userQueries.viewAllSouchalay;
 
 const initiateCampaign = campaignQueries.initiateCampaign;
 const getCampaignName = campaignQueries.getCampaignName;
@@ -80,4 +81,5 @@ module.exports = {
   wardName,
   filterComplaints,
   getAdminDetails,
+  viewAllSouchalay
 };

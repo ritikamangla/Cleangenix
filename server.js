@@ -194,12 +194,14 @@ app.get("/user/souchalay/:user_id", (req, res) => {
 
 app.post("/user/souchalay/:user_id", db.souchalay);
 
-app.get("/user/souchalay/:lat/:long", (req, res) => {
+/*app.get("/user/souchalay/:lat/:long", (req, res) => {
   res.render("souchalayMap", {
     lat: req.params.lat,
     long: req.params.long,
   });
-});
+});*/
+
+app.post("/user/souchalay/:lat/:long/:user_id", db.viewAllSouchalay);
 
 //********************NewsLetter*********************
 
