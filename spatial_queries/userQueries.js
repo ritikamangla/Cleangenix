@@ -160,14 +160,16 @@ const postUserComplaintForm = async (req, res) => {
 
       //******************ML part*************************
 
-      // boolTrash = await util.detectTrash(`../public/active_complaints/${req.file.filename}`)
-      // //console.log("this is the type of ", typeof(boolTrash))
-      // const trashOrNot= boolTrash.trim().charAt(boolTrash.trim().length-1);
+      boolTrash = await util.detectTrash(
+        `../public/active_complaints/${req.file.filename}`
+      );
+      //console.log("this is the type of ", typeof(boolTrash))
+      const trashOrNot = boolTrash.trim().charAt(boolTrash.trim().length - 1);
 
-      // if(trashOrNot==="0"){
-      //   errors.push({ message: "No trash detected" });
-      //   res.render("uploadComplaintForm", { errors, user_id, color: "red" });
-      // }
+      if (trashOrNot === "0") {
+        errors.push({ message: "No trash detected" });
+        res.render("uploadComplaintForm", { errors, user_id, color: "red" });
+      }
 
       //get location from the photo
       console.log(req.file);

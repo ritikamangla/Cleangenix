@@ -89,16 +89,16 @@ const postWorkerResolvedForm = async (req, res) => {
         res.render("workerUpload", { errors, worker_id, color: "red" });
       } else {
         //*************************ML part***************************
-        // boolTrash = await util.detectTrash(
-        //   `../public/resolved_complaints/${req.file.filename}`
-        // );
-        //console.log("this is the type of ", typeof(boolTrash))
-        // const trashOrNot = boolTrash.trim().charAt(boolTrash.trim().length - 1);
+        boolTrash = await util.detectTrash(
+          `../public/resolved_complaints/${req.file.filename}`
+        );
+        console.log("this is the type of ", typeof(boolTrash))
+        const trashOrNot = boolTrash.trim().charAt(boolTrash.trim().length - 1);
 
-        // if (trashOrNot === "1") {
-        //   errors.push({ message: "Trash detected!" });
-        //   res.render("workerUpload", { errors, worker_id, color: "red" });
-        // }
+        if (trashOrNot === "1") {
+          errors.push({ message: "Trash detected!" });
+          res.render("workerUpload", { errors, worker_id, color: "red" });
+        }
         console.log(lat);
         console.log(long);
         const complaint_id = req.body.complaint_id;
